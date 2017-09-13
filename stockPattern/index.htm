@@ -1,0 +1,133 @@
+﻿<html>
+<head>
+	<script type="text/javascript" src="jquery-1.11.0.min.js"></script>
+	<!-- Load c3.css -->
+	<link href="c3.css" rel="stylesheet">
+	<!-- Load d3.js and c3.js -->
+	<script src="d3.v3.min.js" charset="utf-8"></script>
+	<script src="c3.min.js"></script>
+</head>
+<body bgcolor="#ccccff">
+
+<canvas width="500" height="300" id="myCanvas" style="border:1px solid;position:absolute;top:50;left:100;"></canvas>
+<div id="buttons" style="position:absolute;top:360;left:100;width:500">
+<center>
+<input type="button" id="redraw" value="重新繪製">
+<input type="button" id="search" value="搜尋">
+<br/><br/>
+<div id="result" style="border:1px solid">
+<div id="chart0"></div><br/>
+<div id="chart1"></div><br/>
+<div id="chart2"></div><br/>
+<div id="chart3"></div><br/>
+<div id="chart4"></div><br/>
+</div>
+<br/><br/>
+Special Thanks: 韓傳祥 教授, Eugene Yang 博士生, 陳重吉 博士生
+<br/><br/>
+</center>
+</div>
+
+<script>
+var canvas = document.getElementById("myCanvas"); // 取得物件
+var ctx = canvas.getContext("2d"); // 取得繪圖環境
+var drawMode, mx, my;
+w = 500;
+h = 300;
+
+window.onload = function(){
+	newLeft = Math.max(1, (window.innerWidth-canvas.width)/2);
+	canvas.style.left = newLeft + 'px';
+	document.getElementById("buttons").style.left = canvas.style.left;
+	ctx.fillStyle = "#fff"; // 用以填滿的色彩(以CSS語法指定色彩)。
+	ctx.fillRect(0, 0, w, h);
+}
+
+window.onresize = function(){
+	newLeft = Math.max(1, (window.innerWidth-canvas.width)/2);
+	canvas.style.left = newLeft + 'px';
+	document.getElementById("buttons").style.left = canvas.style.left;
+}
+
+canvas.onmousedown = function(ev){
+	ctx.beginPath();
+	ctx.strokeStyle = "#000";
+	ctx.lineWidth = 1;
+	mx = event.clientX - parseInt(canvas.style.left) + window.pageXOffset;
+	my = event.clientY - parseInt(canvas.style.top) + window.pageYOffset;
+	ctx.moveTo(mx, my);
+	drawMode = true;
+}
+
+canvas.onmousemove = function(ev){
+	if(drawMode){
+		mx = event.clientX - parseInt(canvas.style.left) + window.pageXOffset;
+		my = event.clientY - parseInt(canvas.style.top) + window.pageYOffset;
+		ctx.lineTo(mx, my);
+		ctx.stroke();
+	}
+}
+
+canvas.onmouseup = function(){
+	drawMode = false;
+}
+
+document.getElementById("redraw").onclick = function(){
+	ctx.fillStyle = "#fff"; // 用以填滿的色彩(以CSS語法指定色彩)。
+	ctx.fillRect(0, 0, w, h);
+}
+
+document.getElementById("search").onclick = function(){
+	var imgObj = ctx.getImageData(0, 0, w, h);
+	var mat = new Array(w);
+	var arr = new Array(w);
+	var qs = '';
+	// Obj to mat
+	for(k=0;k<imgObj.data.length;k+=4){
+		i = Math.floor((k/4)/w);
+		j = (k/4)%w;
+		if(mat[j]==undefined){
+			mat[j] = new Array(h);
+		}
+		mat[j][i] = Math.round((imgObj.data[k]+imgObj.data[k+1]+imgObj.data[k+2])/3);
+	}
+	// Find min idx
+	for(i=0;i<w;i++){
+		idx = mat[i].indexOf(Math.min(...mat[i]));
+		if(idx!=0){
+			qs += (h-idx) + '.';
+		}
+	}
+	// Request
+	console.log(qs);
+	$.get(
+		"search.php",
+		"qs=" + qs,
+		function(responseStr){
+			console.log(responseStr);
+			retResult = JSON.parse(responseStr)
+			for(i=0;i<5;i++){
+				retResult[i]['price'].unshift('Price (' + retResult[i]['name'] + ', ' + retResult[i]['startTime'] + ', ' + retResult[i]['dur'] + ')')
+				retResult[i]['pattern'].unshift('pattern')
+				var chart = c3.generate({
+					bindto: '#chart' + i,
+					data: {
+					  columns: [
+						retResult[i]['price'],
+						retResult[i]['pattern']
+					  ]
+					}
+				});
+			}
+		}
+	);
+}
+
+/**
+document.getElementById("save").onclick = function(){
+	window.open(ctx.canvas.toDataURL('img/png'));
+}**/
+</script>
+
+</body></html>
+
