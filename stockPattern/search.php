@@ -10,6 +10,6 @@ for($i=0;$i<strlen($qs);$i++){
 	}
 }
 
-$out = shell_exec('/home/keene/anaconda3/envs/StockPattern/bin/python /home/keene/FinWebserver/StockPattern/PyStockPattern/code_python4web/search.py '.$qs.' 50 60 2');
+$out = shell_exec('/home/keene/anaconda3/envs/StockPattern/bin/python ../PyStockPattern/code_python4web/search.py '.$qs.' 50 60 2');
 echo $out;
 ?>
