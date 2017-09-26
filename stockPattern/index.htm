@@ -19,14 +19,6 @@
         <input type="button" id="redraw" value="重新繪製">
         <input type="button" id="search" value="搜尋">
         <br/><br/>
-        <p>
-        Online service to recognize any chart patterns that you can imagine; otherwise machine will learn a new one:-)
-        </p>
-        <p>
-        How to use it? Simply draw any chart such as a V or W shape, then press the search bottom. It may take few seconds to select the mostly likely segment from our database of stock prices.</p>
-        <p>
-        如何使用：在上面白色的區塊用滑鼠畫個型態(M頭、W底、cup and handle、...)，系統就會幫你搜尋，反應時間約三到五秒
-        </p>
         <div id="result" style="border:1px solid">
           <div id="chart0"></div><br/>
           <div id="chart1"></div><br/>
@@ -35,7 +27,7 @@
           <div id="chart4"></div><br/>
         </div>
         <br/><br/>
-        Special Thanks: 韓傳祥 教授, 王崇喆 博士, Eugene Yang 博士生, 陳重吉 博士生, 陳彥安
+        Special Thanks: 韓傳祥 教授, Eugene Yang 博士生, 陳重吉 博士生
         <br/><br/>
       </center>
     </div>
@@ -160,6 +152,7 @@ document.getElementById("search").onclick = function(){
     }
   }
   // Request
+  console.log(qs);
   $.get(
       "search.php",
       "qs=" + qs,
@@ -176,7 +169,7 @@ document.getElementById("search").onclick = function(){
                       retResult[i]['price'],
                       retResult[i]['pattern']
                     ]
-                  },
+                  }
                 });
                 }
                 }
